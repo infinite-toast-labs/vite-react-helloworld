@@ -1,16 +1,48 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 
 function App() {
         const [ornaments, setOrnaments] = useState(6);
         const [northPoleName, setNorthPoleName] = useState("the elves");
+        const snowflakeTrailRef = useRef<HTMLDivElement | null>(null);
 
         const ornamentIcons = useMemo(() => ["🎄", "🎁", "⭐", "🍪", "❄️", "🦌", "🧤", "🧣"], []);
+
+        useEffect(() => {
+                const handleMouseMove = (event: MouseEvent) => {
+                        if (!snowflakeTrailRef.current) {
+                                return;
+                        }
+
+                        const snowflake = document.createElement("span");
+                        const size = Math.random() * 12 + 10;
+
+                        snowflake.className = "snowflake";
+                        snowflake.textContent = "❄️";
+                        snowflake.style.left = `${event.clientX}px`;
+                        snowflake.style.top = `${event.clientY}px`;
+                        snowflake.style.fontSize = `${size}px`;
+                        snowflake.style.opacity = `${Math.random() * 0.4 + 0.6}`;
+
+                        snowflakeTrailRef.current.appendChild(snowflake);
+
+                        window.setTimeout(() => {
+                                snowflake.remove();
+                        }, 1200);
+                };
+
+                window.addEventListener("mousemove", handleMouseMove);
+
+                return () => {
+                        window.removeEventListener("mousemove", handleMouseMove);
+                };
+        }, []);
 
         return (
                 <main className="page">
                         <div className="twinkles" aria-hidden />
                         <div className="snow" aria-hidden />
+                        <div className="snowflake-trail" aria-hidden ref={snowflakeTrailRef} />
 
                         <header className="hero">
                                 <p className="eyebrow">Festive Hello World</p>
